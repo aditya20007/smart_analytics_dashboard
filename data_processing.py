@@ -12,16 +12,30 @@ from sklearn.preprocessing import LabelEncoder
 
 # ─── 1. LOADING ──────────────────────────────────────────────────────────────
 
+import pandas as pd
+import streamlit as st
+
 def load_data(uploaded_file) -> pd.DataFrame:
     """Read CSV from a Streamlit UploadedFile object."""
     try:
-        df = pd.read_csv(uploaded_file)
-        if df.empty:
-            raise ValueError("The uploaded file is empty.")
-        return df
-    except Exception as e:
-        raise ValueError(f"Could not read file: {e}")
+        if uploaded_file is None:
+            st.warning("Please upload a file.")
+            return None
 
+        uploaded_file.seek(0)  # Fix pointer issue
+
+        df = pd.read_csv(uploaded_file, encoding='latin1')
+
+        if df.empty:
+            st.error("The uploaded file is empty.")
+            return None
+
+        st.success(f"File loaded successfully ✅ Shape: {df.shape}")
+        return df
+
+    except Exception as e:
+        st.error(f"❌ Could not read file: {e}")
+        return None
 
 # ─── 2. VALIDATION ───────────────────────────────────────────────────────────
 
